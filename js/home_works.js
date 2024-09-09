@@ -15,15 +15,63 @@ document.getElementById("gmail_button").addEventListener('click', function () {
 const parentBlock = document.querySelector('.parent_block');
 const childBlock = document.querySelector('.child_block');
 
-let position = 0;
+let positionX = 0, positionY = 0;
+
+const offsetWidth = parentBlock.offsetWidth - childBlock.offsetWidth;
+const offsetHeight = parentBlock.offsetHeight - childBlock.offsetHeight;
 
 function moveBlock() {
-    position += 0.4;
-    if (position >= parentBlock.clientWidth - childBlock.clientWidth) {
-        position = 0;
+    if (positionX < offsetWidth && positionY === 0) {
+        positionX++;
+        childBlock.style.left = `${positionX}px`;
+    } else if (positionX >= offsetWidth && positionY < offsetHeight) {
+        positionY++;
+        childBlock.style.top = `${positionY}px`;
+    } else if (positionY >= offsetHeight && positionX > 0) {
+        positionX--;
+        childBlock.style.left = `${positionX}px`;
+    } else if (positionX === 0 && positionY > 0) {
+        positionY--;
+        childBlock.style.top = `${positionY}px`;
     }
-    childBlock.style.transform = `translateX(${position}px)`;
-    requestAnimationFrame(moveBlock);
+    requestAnimationFrame(moveBlock)
 }
 
 requestAnimationFrame(moveBlock);
+
+let intervalId;
+let seconds = 0;
+let secondsDisplay = document.getElementById('seconds');
+let startButton = document.getElementById('start');
+let stopButton = document.getElementById('stop');
+let resetButton = document.getElementById('reset');
+
+let updateDisplay = () => {
+    secondsDisplay.textContent = seconds;
+}
+
+let startTimer = () => {
+    if (!intervalId) {
+        intervalId = setInterval(() => {
+            seconds++;
+            updateDisplay();
+        }, 1000)
+    }
+}
+
+let stopTimer = () => {
+    if (intervalId) {
+        clearInterval(intervalId)
+        intervalId = null;
+    }
+}
+
+let resetTimer = () => {
+    stopTimer();
+    seconds = 0;
+    updateDisplay();
+}
+
+startButton.addEventListener('click', startTimer);
+stopButton.addEventListener('click', stopTimer);
+resetButton.addEventListener('click', resetTimer);
